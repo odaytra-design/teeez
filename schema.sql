@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS marketers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL UNIQUE,
+  governorate TEXT NOT NULL,
+  code TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_marketers_code ON marketers(code);

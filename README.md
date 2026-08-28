@@ -1,21 +1,23 @@
-# Syria Commerce — Phase 1
+# Syria Commerce — Phase 2
+## لوحة المسوقين + تجهيز التخزين الدائم
 
-نظام المسوقين — التسجيل وإنشاء كود مسوق.
+هذه المرحلة مبنية على النسخة التي نجح Deploy فيها بدون `src/index.js` وبدون `assets.directory`.
 
-## Cloudflare
+### الملفات
+- `index.js` — Worker كامل
+- `wrangler.jsonc` — مضبوط على `index.js` في الجذر
+- `schema.sql` — قاعدة D1 للمرحلة الثانية
+- `package.json`
+- `README.md`
 
-- Build command: `npm install`
-- Deploy command: `npx wrangler deploy`
-- لا يوجد `src/index.js`
-- لا يوجد `assets.directory`
-- لا توجد Bindings مطلوبة في هذه المرحلة
+### مهم
+النسخة الحالية **Deploy-safe** حتى قبل إنشاء وربط D1؛ لذلك لن نضيف Binding الآن ونعرّض الـDeploy للفشل.
 
-## Endpoints
+بعد نجاح الـDeploy، الخطوة التالية ستكون إنشاء D1 وربطه باسم `DB` ثم تشغيل `schema.sql`، وبعدها يصبح تسجيل المسوقين دائمًا.
 
-- `/` الموقع
-- `/api/health` فحص النظام
-- `POST /api/register` تسجيل مسوق وإنشاء كود
-
-### ملاحظة
-
-هذه المرحلة مخصصة لاختبار واجهة التسجيل وتدفق إنشاء الكود بدون إدخال قاعدة بيانات جديدة حتى لا نغيّر إعداد Cloudflare العامل. المرحلة التالية هي التخزين الدائم + لوحة المسوق.
+### المسارات
+- `/` الرئيسية
+- `/dashboard` لوحة المسوقين
+- `/api/health`
+- `GET /api/marketers`
+- `POST /api/marketers`
