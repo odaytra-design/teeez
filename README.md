@@ -1,12 +1,9 @@
-# Syria Commerce — Phase 6
-## نظام العمولات
+# Syria Commerce — Phase 6 FIXED
+Built directly from the confirmed Phase 5.
 
-- العمولة مرتبطة بالطلب والمسوق
-- العمولة تصبح مستحقة عند حالة `delivered`
-- الطلب الملغي لا يولد عمولة مستحقة
-- إجمالي العمولات المستحقة
-- إجمالي العمولات قيد الانتظار
-- ملخص عمولات كل مسوق
-- بدون D1 حالياً، والواجهة جاهزة للربط لاحقاً
+Commission rule:
+- New / confirmed / preparing / shipped = waiting
+- Delivered = commission becomes due
+- Cancelled = not due
 
-لا تغيّر إعداد Cloudflare الحالي.
+No D1 is activated in this phase.
