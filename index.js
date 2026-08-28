@@ -107,10 +107,43 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
-      return htmlResponse(`<header><main><h1>Syria Commerce</h1><p>منصة التجارة — المرحلة 2</p></main></header><main>
-<div class="card"><h2>نظام المسوقين</h2><p class="muted">تسجيل المسوقين وإنشاء الأكواد وعرضهم من لوحة الإدارة.</p>
-<a class="btn" href="/dashboard">فتح لوحة المسوقين</a></div></main>`);
+      return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Syria Commerce | الإدارة</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+.top{background:#111827;color:white;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+nav,.card{background:white;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
+nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.stat{padding:20px}.num{font-size:30px;font-weight:700;margin-top:8px}.muted{color:#667085}
+.section{padding:20px}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
+@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+</style></head><body>
+<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">منصة التجارة الإلكترونية — لوحة الإدارة</div></div></header>
+<div class="layout">
+<nav>
+<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+</nav>
+<main>
+<div class="card hero"><span class="badge">المرحلة 3</span><h1>لوحة الإدارة الرئيسية</h1><p class="muted">الهيكل الأساسي جاهز. سنفعّل كل نظام تدريجياً قبل ربط قاعدة البيانات.</p></div>
+<div class="grid" style="margin-top:14px">
+<div class="card stat"><div class="muted">المسوقون</div><div class="num">—</div></div>
+<div class="card stat"><div class="muted">الطلبات</div><div class="num">—</div></div>
+<div class="card stat"><div class="muted">العمولات</div><div class="num">—</div></div>
+<div class="card stat"><div class="muted">العملاء</div><div class="num">—</div></div>
+</div>
+<div class="card section" style="margin-top:14px"><h2>الأنظمة القادمة</h2><p class="muted">المنتجات • الطلبات • العمولات • العملاء • التقارير • الصلاحيات</p></div>
+</main></div></body></html>`);
     }
+    
+    if (request.method === "GET" && ["/products","/orders","/commissions","/customers","/reports","/settings"].includes(url.pathname)) {
+      const names = {"/products":"المنتجات","/orders":"الطلبات","/commissions":"العمولات","/customers":"العملاء","/reports":"التقارير","/settings":"الإعدادات"};
+      return htmlResponse(`<header style="background:#111827;color:#fff;padding:22px"><h1 style="max-width:1000px;margin:auto">Syria Commerce</h1></header><main style="max-width:1000px;margin:25px auto;padding:0 16px"><div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:24px"><h2>${names[url.pathname]}</h2><p style="color:#667085">هذه الواجهة موجودة الآن ضمن الهيكل، وسيتم بناء وظائفها في المرحلة التالية.</p><a href="/" style="display:inline-block;padding:10px 15px;background:#111827;color:#fff;border-radius:9px;text-decoration:none">العودة للرئيسية</a></div></main>`);
+    }
+
     if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
     if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});
