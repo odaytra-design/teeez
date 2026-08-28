@@ -42,5 +42,3 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_marketer ON orders(marketer_code);
 CREATE INDEX IF NOT EXISTS idx_orders_product ON orders(product_id);
-
-CREATE INDEX IF NOT EXISTS idx_orders_customer_phone ON orders(customer_phone);
