@@ -730,7 +730,7 @@ async function activityPage(env) {
   function get(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch{return []}}
   function save(x){localStorage.setItem(KEY,JSON.stringify(x.slice(0,200)));render()}
   function add(type,event,user="المدير"){save([{type,event,user,time:new Date().toISOString()},...get()])}
-  function render(){const data=get(), body=document.getElementById("rows"), empty=document.getElementById("empty");body.innerHTML=data.map(x=>`<tr><td class="time">${new Date(x.time).toLocaleString("ar-JO")}</td><td><span class="badge">${x.type}</span></td><td>${String(x.event).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}</td><td>${x.user||"—"}</td></tr>`).join("");empty.style.display=data.length?"none":"block"}
+   function render(){const data=get(), body=document.getElementById("rows"), empty=document.getElementById("empty");body.innerHTML=data.map(function(x){var ev=String(x.event||"").replace(/[&<>]/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[m]});return "<tr><td class=\"time\">"+new Date(x.time).toLocaleString("ar-JO")+"</td><td><span class=\"badge\">"+String(x.type||"")+"</span></td><td>"+ev+"</td><td>"+String(x.user||"—")+"</td></tr>"}).join("");empty.style.display=data.length?"none":"block"}
   document.getElementById("add").onclick=()=>add("ACTION","تمت إضافة حدث تجريبي");
   document.getElementById("seed").onclick=()=>{const now=Date.now();save(base.map((x,i)=>({...x,time:new Date(now-i*60000).toISOString()})).concat(get()))};
   document.getElementById("clear").onclick=()=>{if(confirm("مسح سجل النشاط من هذا الجهاز؟")){localStorage.removeItem(KEY);render()}};
