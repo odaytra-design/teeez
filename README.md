@@ -1,17 +1,11 @@
-# Syria Commerce — Phase 15 Consolidated FIXED
+# Syria Commerce — Phase 16 Customer Support
 
-Base: Phase 12 Notifications.
+ONLY Phase 16 was added:
+- `/support` — Customer Support interface
+- Ticket list
+- Open/closed status
+- Close-ticket interaction
+- Responsive Arabic RTL UI
+- No database/store dependency
 
-Consolidated additions:
-- Phase 13: `/search`
-- Phase 14: `/login`
-- Phase 15: `/register`
-
-This package includes the Phase 12 base plus all three additions,
-so it can be deployed directly instead of uploading four separate ZIPs.
-
-Pre-deployment checks:
-- Node JavaScript syntax check
-- wrangler.jsonc JSON validation
-- entry point verification
-- route verification
+Payouts and Data Management were intentionally NOT added.
