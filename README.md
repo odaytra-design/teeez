@@ -1,13 +1,14 @@
-# Syria Commerce — Phase 10 FIXED
+# Syria Commerce — Phase 11 FIXED
 
-Built directly from Phase 9 FIXED.
+Built directly from Phase 10 FIXED.
 
-Phase 10:
-- Roles and permissions center
-- Admin / Products Manager / Accounting / Customer Service roles
-- Permissions matrix for all main systems
-- Browser-local persistence
-- Reset to defaults
-- Added permissions navigation and route
+Phase 11:
+- Activity / audit log center
+- Arabic RTL responsive interface
+- Local browser persistence (up to 200 events)
+- Add demo activity
+- Seed core system events
+- Clear activity log
+- Navigation and `/activity` route
 
 No database activation yet. Existing phases are preserved.
