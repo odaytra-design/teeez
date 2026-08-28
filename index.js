@@ -388,6 +388,89 @@ async function commissionsPage(env){
   </main></div></body></html>`,"العمولات");
 }
 
+
+async function listCustomers(db) {
+  if (!db) {
+    const map = new Map();
+    for (const o of DEMO_ORDERS) {
+      const phone = String(o.customer_phone || "").trim();
+      if (!phone) continue;
+      if (!map.has(phone)) {
+        map.set(phone,{name:o.customer_name,phone,governorate:o.governorate,orders:0,total:0,last_order:o.created_at});
+      }
+      const c=map.get(phone);
+      c.orders++;
+      c.total += Number(o.total || 0);
+      if (new Date(o.created_at) > new Date(c.last_order)) c.last_order=o.created_at;
+    }
+    return [...map.values()].sort((a,b)=>b.orders-a.orders);
+  }
+
+  const r=await db.prepare(`
+    SELECT customer_name AS name, customer_phone AS phone, governorate,
+           COUNT(*) AS orders, COALESCE(SUM(total),0) AS total,
+           MAX(created_at) AS last_order
+    FROM orders
+    GROUP BY customer_phone, customer_name, governorate
+    ORDER BY last_order DESC
+  `).all();
+  return r.results || [];
+}
+
+async function customersPage(env) {
+  const rows=await listCustomers(getStore(env));
+  const total=rows.reduce((a,c)=>a+Number(c.total||0),0);
+
+  const tr=rows.map(c=>`
+    <tr>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td>${esc(c.phone)}</td>
+      <td>${esc(c.governorate)}</td>
+      <td>${c.orders}</td>
+      <td>${Number(c.total).toFixed(2)}</td>
+      <td>${c.last_order ? new Date(c.last_order).toLocaleDateString("ar-JO") : "-"}</td>
+    </tr>`).join("");
+
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>العملاء | Syria Commerce</title>
+  <style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+  .top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+  .brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+  nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+  nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
+  nav a:hover{background:#f1f5f9}.section,.stat{padding:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:14px 0}
+  .num{font-size:28px;font-weight:700;margin-top:8px}.muted{color:#667085}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
+  table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap}
+  @media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+  </style></head><body>
+  <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إدارة العملاء</div></div></header>
+  <div class="layout">
+  <nav>
+    <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+    <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+  </nav>
+  <main>
+    <div class="card section"><span class="badge">Phase 7</span>
+      <h1>العملاء</h1>
+      <p class="muted">يتم تجميع العميل تلقائياً من الطلبات باستخدام رقم الهاتف.</p>
+    </div>
+    <div class="grid">
+      <div class="card stat"><div class="muted">عدد العملاء</div><div class="num">${rows.length}</div></div>
+      <div class="card stat"><div class="muted">إجمالي المشتريات</div><div class="num">${total.toFixed(2)}</div></div>
+    </div>
+    <div class="card section">
+      <h2>قائمة العملاء</h2>
+      <div style="overflow:auto"><table>
+      <thead><tr><th>الاسم</th><th>الهاتف</th><th>المحافظة</th><th>الطلبات</th><th>إجمالي الشراء</th><th>آخر طلب</th></tr></thead>
+      <tbody>${tr || '<tr><td colspan="6">لا يوجد عملاء بعد</td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </main></div></body></html>`,"العملاء");
+}
+
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -458,6 +541,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/products") return productsPage(env);
     if (request.method === "GET" && url.pathname === "/orders") return ordersPage(env);
     if (request.method === "GET" && url.pathname === "/commissions") return commissionsPage(env);
+    if (request.method === "GET" && url.pathname === "/customers") return customersPage(env);
 
     if (request.method === "GET" && ["/orders","/commissions","/customers","/reports","/settings"].includes(url.pathname)) {
       const names = {"/orders":"الطلبات","/commissions":"العمولات","/customers":"العملاء","/reports":"التقارير","/settings":"الإعدادات"};
