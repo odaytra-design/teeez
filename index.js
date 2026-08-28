@@ -171,7 +171,7 @@ async function productsPage(env) {
 <nav>
 <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
 <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
-<a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a>
+<a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a><a href="/support">🎧 دعم العملاء</a><a href="/payouts">💸 سحب العمولات</a>
 </nav>
 <main>
 <div class="card hero"><span class="badge">المرحلة 4</span><h1>نظام المنتجات</h1>
@@ -674,7 +674,7 @@ async function permissionsPage(env) {
   <nav>
     <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
     <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
-    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a>
   </nav>
   <main>
     <div class="card section"><span class="badge">Phase 10</span>
@@ -900,6 +900,56 @@ function closeTicket(btn){
 </script></body></html>`,"دعم العملاء");
 }
 
+
+function payoutsPage() {
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سحب العمولات | Syria Commerce</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+.top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+nav{padding:10px;height:max-content}nav a{display:block;padding:11px;border-radius:10px;color:#172033;text-decoration:none}
+nav a:hover{background:#f1f5f9}.section{padding:22px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{padding:16px;border:1px solid #e5e7eb;border-radius:12px}.num{font-size:25px;font-weight:700;margin-top:5px}
+.request{margin-top:12px;padding:15px;border:1px solid #e5e7eb;border-radius:12px}
+.status{display:inline-block;padding:5px 9px;border-radius:999px;font-size:13px}.pending{background:#fff7ed;color:#9a3412}.approved{background:#ecfdf3;color:#067647}.rejected{background:#fef3f2;color:#b42318}
+button{border:0;border-radius:9px;padding:9px 13px;background:#111827;color:#fff;cursor:pointer;margin:8px 5px 0 0}
+.reject{background:#fff;border:1px solid #d0d5dd;color:#344054}.muted{color:#667085}
+@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+</style></head><body>
+<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">سحب العمولات</div></div></header>
+<div class="layout"><nav>
+<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+<a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+<a href="/reports">📊 التقارير</a><a href="/notifications">🔔 الإشعارات</a><a href="/search">🔎 البحث</a>
+<a href="/support">🎧 دعم العملاء</a><a href="/payouts">💸 سحب العمولات</a>
+</nav><main><div class="card section">
+<h1>💸 سحب العمولات</h1><p class="muted">مراجعة طلبات سحب العمولات وتغيير حالتها.</p>
+<div class="grid">
+<div class="stat"><div class="muted">طلبات معلقة</div><div class="num" id="pendingCount">2</div></div>
+<div class="stat"><div class="muted">تمت الموافقة</div><div class="num">5</div></div>
+<div class="stat"><div class="muted">إجمالي المبلغ المعلق</div><div class="num" id="total">85 د.أ</div></div>
+</div>
+<div id="requests">
+<div class="request"><b>#PAY-2001 — أحمد</b><p class="muted">المبلغ: 50 د.أ · طريقة السحب: تحويل بنكي</p><span class="status pending">معلق</span><br><button onclick="approve(this)">موافقة</button><button class="reject" onclick="reject(this)">رفض</button></div>
+<div class="request"><b>#PAY-2002 — محمد</b><p class="muted">المبلغ: 35 د.أ · طريقة السحب: محفظة إلكترونية</p><span class="status pending">معلق</span><br><button onclick="approve(this)">موافقة</button><button class="reject" onclick="reject(this)">رفض</button></div>
+</div>
+</div></main></div>
+<script>
+function finish(btn,text,cls){
+ const box=btn.parentElement,status=box.querySelector(".status");
+ status.className="status "+cls;status.textContent=text;
+ box.querySelectorAll("button").forEach(x=>x.remove());
+ const n=document.getElementById("pendingCount");n.textContent=Math.max(0,Number(n.textContent)-1);
+}
+function approve(btn){finish(btn,"تمت الموافقة","approved")}
+function reject(btn){finish(btn,"مرفوض","rejected")}
+</script></body></html>`,"سحب العمولات");
+}
+
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -953,7 +1003,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
 <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">منصة التجارة الإلكترونية — لوحة الإدارة</div></div></header>
 <div class="layout">
 <nav>
-<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a>
+<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a><a href="/notifications">🔔 الإشعارات</a><a href="/support">🎧 دعم العملاء</a><a href="/payouts">💸 سحب العمولات</a>
 </nav>
 <main>
 <div class="card hero"><span class="badge">المرحلة 3</span><h1>لوحة الإدارة الرئيسية</h1><p class="muted">الهيكل الأساسي جاهز. سنفعّل كل نظام تدريجياً قبل ربط قاعدة البيانات.</p></div>
@@ -982,6 +1032,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/login") return authPage();
     if (request.method === "GET" && url.pathname === "/register") return registerPage();
     if (request.method === "GET" && url.pathname === "/support") return supportPage();
+    if (request.method === "GET" && url.pathname === "/payouts") return payoutsPage();
 if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
     if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});

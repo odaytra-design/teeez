@@ -1,11 +1,12 @@
-# Syria Commerce — Phase 16 Customer Support
+# Syria Commerce — Phase 17 Corrected
 
-ONLY Phase 16 was added:
-- `/support` — Customer Support interface
-- Ticket list
-- Open/closed status
-- Close-ticket interaction
-- Responsive Arabic RTL UI
-- No database/store dependency
+Base: the user's working Phase 12-derived package, with:
+- Phase 16 Customer Support: /support
+- Phase 17 Commission Withdrawals: /payouts
 
-Payouts and Data Management were intentionally NOT added.
+Correction:
+- Added visible links to Support and Commission Withdrawals in the admin navigation.
+- No Data Management added.
+- No database dependency added to these two new pages.
+
+Do not deploy any other Phase for this step.
