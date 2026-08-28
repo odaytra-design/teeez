@@ -22,6 +22,13 @@ label{display:block;margin-bottom:6px;font-weight:600}.row{display:grid;grid-tem
 </style></head><body>${body}</body></html>`;
 }
 
+
+function htmlResponse(body, title = "Syria Commerce") {
+  return new Response(html(body, title), {
+    headers: {"content-type":"text/html; charset=utf-8"}
+  });
+}
+
 function json(data, status=200) {
   return new Response(JSON.stringify(data), {status, headers: {"content-type":"application/json; charset=utf-8"}});
 }
@@ -69,7 +76,7 @@ async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
   const tr = rows.map(x => `<tr><td>${x.code}</td><td>${x.name}</td><td>${x.phone}</td><td>${x.governorate}</td><td>${new Date(x.created_at).toLocaleString("ar-JO")}</td></tr>`).join("");
-  return html(`<header><main><h1>Syria Commerce</h1><span class="badge">لوحة المسوقين — المرحلة 2</span></main></header>
+  return htmlResponse(`<header><main><h1>Syria Commerce</h1><span class="badge">لوحة المسوقين — المرحلة 2</span></main></header>
 <main>
 <div class="card"><div class="notice">${dbState}</div></div>
 <div class="grid">
@@ -100,9 +107,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
-      return new Response(html(`<header><main><h1>Syria Commerce</h1><p>منصة التجارة — المرحلة 2</p></main></header><main>
+      return htmlResponse(`<header><main><h1>Syria Commerce</h1><p>منصة التجارة — المرحلة 2</p></main></header><main>
 <div class="card"><h2>نظام المسوقين</h2><p class="muted">تسجيل المسوقين وإنشاء الأكواد وعرضهم من لوحة الإدارة.</p>
-<a class="btn" href="/dashboard">فتح لوحة المسوقين</a></div></main>`));
+<a class="btn" href="/dashboard">فتح لوحة المسوقين</a></div></main>`);
     }
     if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
