@@ -171,7 +171,7 @@ async function productsPage(env) {
 <nav>
 <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
 <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
-<a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+<a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a>
 </nav>
 <main>
 <div class="card hero"><span class="badge">المرحلة 4</span><h1>نظام المنتجات</h1>
@@ -303,7 +303,7 @@ async function ordersPage(env){
  const products=await listProducts(getStore(env));
  const opts=products.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.price}</option>`).join("");
  return htmlResponse(`<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إدارة الطلبات</div></div></header>
- <div class="layout"><nav><a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a></nav>
+ <div class="layout"><nav><a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a></nav>
  <main><div class="card section"><span class="badge">المرحلة 5</span><h1>نظام الطلبات</h1><p class="muted">تسجيل الطلب، ربطه بالمنتج والمسوق، ومتابعة حالته حتى التسليم.</p></div>
  <div class="card section"><h2>تسجيل طلب</h2><form id="orderForm"><div class="row"><div><label>المنتج</label><select name="product_id" required>${opts}</select></div><div><label>الكمية</label><input name="quantity" type="number" min="1" value="1" required></div></div>
  <div class="row"><div><label>اسم العميل</label><input name="customer_name" required></div><div><label>هاتف العميل</label><input name="customer_phone" required></div></div>
@@ -489,7 +489,7 @@ async function reportsPage(env) {
   <nav>
     <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
     <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
-    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a>
   </nav>
   <main>
     <div class="card section"><span class="badge">Phase 8</span><h1>التقارير</h1>
@@ -600,7 +600,7 @@ async function settingsPage(env) {
   <nav>
     <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
     <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
-    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a>
   </nav>
   <main>
     <div class="card section"><h1>إعدادات المتجر</h1>
@@ -645,6 +645,76 @@ async function settingsPage(env) {
   document.getElementById("reset").onclick=()=>{localStorage.removeItem("sc_settings");load()};
   load();
   </script></body></html>`,"الإعدادات");
+}
+
+async function permissionsPage(env) {
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>الصلاحيات | Syria Commerce</title>
+  <style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+  .top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+  .brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+  nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+  nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
+  nav a:hover{background:#f1f5f9}.section{padding:20px;margin-bottom:14px}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
+  .muted{color:#667085}.notice{padding:12px;border-radius:10px;background:#fffbeb;color:#92400e;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #eee;text-align:right}
+  .check{display:flex;align-items:center;gap:8px;justify-content:center}.check input{width:18px;height:18px}
+  button{border:0;border-radius:10px;padding:12px 18px;background:#111827;color:#fff;cursor:pointer;font-size:15px}
+  .secondary{background:#eef2ff;color:#111827;margin-right:8px}.ok{display:none;padding:12px;border-radius:10px;background:#ecfdf3;color:#067647;margin-top:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .role{padding:16px;border:1px solid #e5e7eb;border-radius:12px}.role h3{margin-top:0}
+  @media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+  </style></head><body>
+  <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إدارة الصلاحيات</div></div></header>
+  <div class="layout">
+  <nav>
+    <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+    <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/permissions">🔐 الصلاحيات</a>
+  </nav>
+  <main>
+    <div class="card section"><span class="badge">Phase 10</span>
+      <h1>الصلاحيات والأدوار</h1>
+      <p class="muted">تجهيز نظام التحكم بصلاحيات المستخدمين قبل ربط قاعدة البيانات.</p>
+      <div class="notice">حالياً يتم حفظ الصلاحيات على هذا المتصفح فقط. عند ربط قاعدة البيانات سيتم نقلها للحفظ المركزي.</div>
+    </div>
+
+    <div class="grid">
+      <div class="card role"><h3>👑 مدير النظام</h3><p class="muted">صلاحية كاملة على جميع الأنظمة.</p></div>
+      <div class="card role"><h3>📦 مدير المنتجات</h3><p class="muted">المنتجات والمخزون والطلبات.</p></div>
+      <div class="card role"><h3>💰 المحاسبة</h3><p class="muted">العمولات والتقارير المالية.</p></div>
+      <div class="card role"><h3>👥 خدمة العملاء</h3><p class="muted">العملاء والطلبات والمتابعة.</p></div>
+    </div>
+
+    <div class="card section" style="margin-top:14px">
+      <h2>صلاحيات الأدوار</h2>
+      <div style="overflow:auto"><table>
+      <thead><tr><th>النظام</th><th>مدير النظام</th><th>المنتجات</th><th>المحاسبة</th><th>خدمة العملاء</th></tr></thead>
+      <tbody>
+        <tr><td>المسوقون</td><td><input type="checkbox" data-k="admin-marketers" checked></td><td><input type="checkbox" data-k="products-marketers"></td><td><input type="checkbox" data-k="finance-marketers"></td><td><input type="checkbox" data-k="support-marketers" checked></td></tr>
+        <tr><td>المنتجات</td><td><input type="checkbox" data-k="admin-products" checked></td><td><input type="checkbox" data-k="products-products" checked></td><td><input type="checkbox" data-k="finance-products"></td><td><input type="checkbox" data-k="support-products"></td></tr>
+        <tr><td>الطلبات</td><td><input type="checkbox" data-k="admin-orders" checked></td><td><input type="checkbox" data-k="products-orders" checked></td><td><input type="checkbox" data-k="finance-orders" checked></td><td><input type="checkbox" data-k="support-orders" checked></td></tr>
+        <tr><td>العمولات</td><td><input type="checkbox" data-k="admin-commissions" checked></td><td><input type="checkbox" data-k="products-commissions"></td><td><input type="checkbox" data-k="finance-commissions" checked></td><td><input type="checkbox" data-k="support-commissions"></td></tr>
+        <tr><td>العملاء</td><td><input type="checkbox" data-k="admin-customers" checked></td><td><input type="checkbox" data-k="products-customers"></td><td><input type="checkbox" data-k="finance-customers"></td><td><input type="checkbox" data-k="support-customers" checked></td></tr>
+        <tr><td>التقارير</td><td><input type="checkbox" data-k="admin-reports" checked></td><td><input type="checkbox" data-k="products-reports"></td><td><input type="checkbox" data-k="finance-reports" checked></td><td><input type="checkbox" data-k="support-reports" checked></td></tr>
+        <tr><td>الإعدادات</td><td><input type="checkbox" data-k="admin-settings" checked></td><td><input type="checkbox" data-k="products-settings"></td><td><input type="checkbox" data-k="finance-settings"></td><td><input type="checkbox" data-k="support-settings"></td></tr>
+      </tbody></table></div>
+      <button id="save" style="margin-top:14px">حفظ الصلاحيات</button>
+      <button id="reset" class="secondary">إعادة الافتراضي</button>
+      <div id="ok" class="ok">تم حفظ الصلاحيات على هذا الجهاز ✅</div>
+    </div>
+  </main></div>
+  <script>
+  const boxes=[...document.querySelectorAll('input[type="checkbox"]')];
+  function load(){const x=JSON.parse(localStorage.getItem("sc_permissions")||"{}");boxes.forEach(b=>{if(Object.prototype.hasOwnProperty.call(x,b.dataset.k))b.checked=!!x[b.dataset.k]})}
+  document.getElementById("save").onclick=()=>{const x={};boxes.forEach(b=>x[b.dataset.k]=b.checked);localStorage.setItem("sc_permissions",JSON.stringify(x));document.getElementById("ok").style.display="block";setTimeout(()=>document.getElementById("ok").style.display="none",2200)};
+  document.getElementById("reset").onclick=()=>{localStorage.removeItem("sc_permissions");location.reload()};
+  load();
+  </script></body></html>`,"الصلاحيات");
 }
 
 async function dashboard(env) {
@@ -700,7 +770,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
 <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">منصة التجارة الإلكترونية — لوحة الإدارة</div></div></header>
 <div class="layout">
 <nav>
-<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a>
 </nav>
 <main>
 <div class="card hero"><span class="badge">المرحلة 3</span><h1>لوحة الإدارة الرئيسية</h1><p class="muted">الهيكل الأساسي جاهز. سنفعّل كل نظام تدريجياً قبل ربط قاعدة البيانات.</p></div>
@@ -720,6 +790,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/customers") return customersPage(env);
     if (request.method === "GET" && url.pathname === "/reports") return reportsPage(env);
     if (request.method === "GET" && url.pathname === "/settings") return settingsPage(env);
+    if (request.method === "GET" && url.pathname === "/permissions") return permissionsPage(env);
 
 
     if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
