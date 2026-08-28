@@ -1,9 +1,11 @@
-# Syria Commerce — Phase 13 FIXED
+# Syria Commerce — Phase 15 FIXED
 
-Phase 13: Unified Search UI.
+Phase 15: Registration UI foundation.
 
-- New `/search` page
-- Arabic RTL responsive interface
-- Safe browser-side demo search
-- No database/store dependency
-- Existing Phase 12 preserved
+- `/register`
+- Customer/marketer account type
+- Password confirmation
+- Browser-local demo user storage
+- No database/API dependency
+- Existing Phase 14 preserved
+- Real authentication and secure password handling come later
