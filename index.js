@@ -896,48 +896,6 @@ document.getElementById("f").onsubmit=function(e){
 </script></body></html>`,"تسجيل الدخول");
 }
 
-
-function registerPage() {
-  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>إنشاء حساب | Syria Commerce</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
-.wrap{max-width:470px;margin:55px auto;padding:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:26px;box-shadow:0 8px 28px #0000000d}
-h1{margin:0 0 7px}.muted{color:#667085}.row{margin:14px 0}label{display:block;font-weight:700;margin-bottom:7px}
-input,select{width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:10px;font-size:16px}
-button{width:100%;border:0;border-radius:10px;padding:13px;background:#111827;color:#fff;font-size:16px;cursor:pointer}
-.notice{display:none;margin-top:14px;padding:11px;border-radius:10px}.ok{background:#ecfdf3;color:#067647}.err{background:#fef3f2;color:#b42318}
-a{display:block;text-align:center;margin-top:16px;color:#344054;text-decoration:none}
-</style></head><body><main class="wrap"><div class="card">
-<h1>إنشاء حساب</h1><p class="muted">أنشئ حسابك في Syria Commerce</p>
-<form id="f">
-<div class="row"><label>الاسم</label><input id="name" required minlength="2" placeholder="الاسم الكامل"></div>
-<div class="row"><label>البريد الإلكتروني</label><input id="email" type="email" required placeholder="name@example.com"></div>
-<div class="row"><label>نوع الحساب</label><select id="role"><option value="customer">عميل</option><option value="marketer">مسوق</option></select></div>
-<div class="row"><label>كلمة المرور</label><input id="password" type="password" required minlength="4" placeholder="••••••••"></div>
-<div class="row"><label>تأكيد كلمة المرور</label><input id="confirm" type="password" required minlength="4" placeholder="••••••••"></div>
-<button>إنشاء الحساب</button></form>
-<div id="msg" class="notice"></div><a href="/login">لديك حساب؟ تسجيل الدخول</a><a href="/">العودة للرئيسية</a>
-</div></main><script>
-document.getElementById("f").onsubmit=function(e){
- e.preventDefault();
- const name=document.getElementById("name").value.trim();
- const email=document.getElementById("email").value.trim().toLowerCase();
- const pass=document.getElementById("password").value;
- const confirm=document.getElementById("confirm").value;
- const role=document.getElementById("role").value;
- const msg=document.getElementById("msg");
- if(pass!==confirm){msg.className="notice err";msg.textContent="كلمتا المرور غير متطابقتين.";msg.style.display="block";return}
- const user={id:Date.now(),name,email,role,createdAt:new Date().toISOString()};
- let users=[];try{users=JSON.parse(localStorage.getItem("sc_users")||"[]")}catch(e){users=[]}
- if(users.some(x=>x.email===email)){msg.className="notice err";msg.textContent="هذا البريد مسجل مسبقاً.";msg.style.display="block";return}
- users.push(user);localStorage.setItem("sc_users",JSON.stringify(users));
- msg.className="notice ok";msg.textContent="تم إنشاء الحساب تجريبياً ✅";msg.style.display="block";
-};
-</script></body></html>`,"إنشاء حساب");
-}
-
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -1017,8 +975,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
 
 
         if (request.method === "GET" && url.pathname === "/search") return searchPage();
-        if (request.method === "GET" && url.pathname === "/register") return registerPage();
-if (request.method === "GET" && url.pathname === "/login") return authPage();
+    if (request.method === "GET" && url.pathname === "/login") return authPage();
 if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
     if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});

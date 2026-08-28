@@ -1,11 +1,10 @@
-# Syria Commerce — Phase 15 FIXED
+# Syria Commerce — Phase 14 FIXED
 
-Phase 15: Registration UI foundation.
+Phase 14: Login UI foundation.
 
-- `/register`
-- Customer/marketer account type
-- Password confirmation
-- Browser-local demo user storage
-- No database/API dependency
-- Existing Phase 14 preserved
-- Real authentication and secure password handling come later
+- `/login`
+- Arabic RTL responsive login page
+- Browser-local demo session
+- No database dependency
+- Existing Phase 13 preserved
+- Real authentication/API comes later
