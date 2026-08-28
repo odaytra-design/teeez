@@ -1,13 +1,13 @@
-# Syria Commerce — Phase 8 FIXED
-Built directly from confirmed Phase 7 FIXED.
+# Syria Commerce — Phase 9 FIXED
+Built directly from confirmed Phase 8 FIXED.
 
-Reports:
-- total orders
-- delivered / active / cancelled
-- delivered sales
-- due commissions
-- order status breakdown
-- product performance
-- marketer performance
+Settings center:
+- store name
+- currency
+- store phone
+- default commission rate setting
+- notification preferences
+- browser-local persistence
+- reset to defaults
 
-No D1 activation yet. Existing Phase 7 customer system is preserved.
+No database activation yet. Existing phases are preserved.

@@ -575,6 +575,78 @@ async function customersPage(env) {
   </main></div></body></html>`,"العملاء");
 }
 
+
+async function settingsPage(env) {
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>الإعدادات | Syria Commerce</title>
+  <style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+  .top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+  .brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+  nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+  nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
+  nav a:hover{background:#f1f5f9}.section{padding:20px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  label{display:block;font-weight:600;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px}
+  .row{margin-bottom:14px}.check{display:flex;align-items:center;gap:10px;padding:12px 0}.check input{width:auto}
+  button{border:0;border-radius:10px;padding:12px 18px;background:#111827;color:#fff;cursor:pointer;font-size:15px}
+  .secondary{background:#eef2ff;color:#111827;margin-right:8px}.notice{padding:12px;border-radius:10px;background:#fffbeb;color:#92400e;margin-bottom:16px}
+  .ok{display:none;padding:12px;border-radius:10px;background:#ecfdf3;color:#067647;margin-top:12px}
+  @media(max-width:700px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+  </style></head><body>
+  <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إعدادات النظام</div></div></header>
+  <div class="layout">
+  <nav>
+    <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+    <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+  </nav>
+  <main>
+    <div class="card section"><h1>إعدادات المتجر</h1>
+      <p style="color:#667085">المرحلة 9: تجهيز مركز التحكم قبل ربط قاعدة البيانات.</p>
+      <div class="notice">حالياً يتم حفظ الإعدادات على هذا المتصفح فقط. عند مرحلة قاعدة البيانات سيتم نقلها للحفظ المركزي.</div>
+      <form id="settingsForm">
+        <div class="grid">
+          <div class="row"><label>اسم المتجر</label><input id="storeName" value="Syria Commerce"></div>
+          <div class="row"><label>العملة</label><select id="currency"><option value="USD">USD — دولار</option><option value="JOD">JOD — دينار أردني</option><option value="SYP">SYP — ليرة سورية</option></select></div>
+          <div class="row"><label>هاتف المتجر</label><input id="phone" placeholder="07xxxxxxxx"></div>
+          <div class="row"><label>نسبة العمولة الافتراضية %</label><input id="commission" type="number" min="0" step="0.1" value="10"></div>
+        </div>
+        <div class="card section" style="box-shadow:none;background:#fafafa">
+          <h2>تشغيل الإشعارات</h2>
+          <label class="check"><input id="newOrder" type="checkbox" checked> تنبيه عند وصول طلب جديد</label>
+          <label class="check"><input id="delivered" type="checkbox" checked> تنبيه عند تسليم الطلب</label>
+          <label class="check"><input id="commissionNotice" type="checkbox" checked> تنبيه عند استحقاق العمولة</label>
+        </div>
+        <button type="submit">حفظ الإعدادات</button>
+        <button type="button" class="secondary" id="reset">إعادة الافتراضي</button>
+        <div id="ok" class="ok">تم حفظ الإعدادات على هذا الجهاز ✅</div>
+      </form>
+    </div>
+  </main></div>
+  <script>
+  const ids=["storeName","currency","phone","commission","newOrder","delivered","commissionNotice"];
+  const defaults={storeName:"Syria Commerce",currency:"USD",phone:"",commission:10,newOrder:true,delivered:true,commissionNotice:true};
+  function load(){
+    let x={...defaults,...JSON.parse(localStorage.getItem("sc_settings")||"{}")};
+    ids.forEach(id=>document.getElementById(id).type==="checkbox"
+      ? document.getElementById(id).checked=!!x[id]
+      : document.getElementById(id).value=x[id]);
+  }
+  document.getElementById("settingsForm").onsubmit=e=>{
+    e.preventDefault();let x={};
+    ids.forEach(id=>x[id]=document.getElementById(id).type==="checkbox"
+      ? document.getElementById(id).checked : document.getElementById(id).value);
+    localStorage.setItem("sc_settings",JSON.stringify(x));
+    document.getElementById("ok").style.display="block";
+    setTimeout(()=>document.getElementById("ok").style.display="none",2200);
+  };
+  document.getElementById("reset").onclick=()=>{localStorage.removeItem("sc_settings");load()};
+  load();
+  </script></body></html>`,"الإعدادات");
+}
+
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -647,11 +719,8 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/commissions") return commissionsPage(env);
     if (request.method === "GET" && url.pathname === "/customers") return customersPage(env);
     if (request.method === "GET" && url.pathname === "/reports") return reportsPage(env);
+    if (request.method === "GET" && url.pathname === "/settings") return settingsPage(env);
 
-    if (request.method === "GET" && ["/orders","/commissions","/customers","/reports","/settings"].includes(url.pathname)) {
-      const names = {"/orders":"الطلبات","/commissions":"العمولات","/customers":"العملاء","/reports":"التقارير","/settings":"الإعدادات"};
-      return htmlResponse(`<header style="background:#111827;color:#fff;padding:22px"><h1 style="max-width:1000px;margin:auto">Syria Commerce</h1></header><main style="max-width:1000px;margin:25px auto;padding:0 16px"><div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:24px"><h2>${names[url.pathname]}</h2><p style="color:#667085">هذه الواجهة موجودة الآن ضمن الهيكل، وسيتم بناء وظائفها في المرحلة التالية.</p><a href="/" style="display:inline-block;padding:10px 15px;background:#111827;color:#fff;border-radius:9px;text-decoration:none">العودة للرئيسية</a></div></main>`);
-    }
 
     if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
