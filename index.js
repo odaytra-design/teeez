@@ -950,6 +950,51 @@ function reject(btn){finish(btn,"مرفوض","rejected")}
 </script></body></html>`,"سحب العمولات");
 }
 
+
+function dataManagementPage() {
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>إدارة البيانات | Syria Commerce</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+.top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+nav{padding:10px;height:max-content}nav a{display:block;padding:11px;border-radius:10px;color:#172033;text-decoration:none}
+nav a:hover{background:#f1f5f9}.section{padding:22px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+.box{padding:18px;border:1px solid #e5e7eb;border-radius:13px}.box h3{margin-top:0}
+button{border:0;border-radius:9px;padding:10px 15px;background:#111827;color:#fff;cursor:pointer;margin-top:8px}
+.muted{color:#667085}.status{margin-top:18px;padding:13px;border-radius:10px;background:#ecfdf3;color:#067647}
+.note{margin-top:18px;padding:14px;border:1px dashed #d0d5dd;border-radius:12px}
+@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+</style></head><body>
+<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إدارة البيانات</div></div></header>
+<div class="layout"><nav>
+<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+<a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+<a href="/reports">📊 التقارير</a><a href="/notifications">🔔 الإشعارات</a><a href="/search">🔎 البحث</a>
+<a href="/support">🎧 دعم العملاء</a><a href="/payouts">💸 سحب العمولات</a><a href="/data">🗄️ إدارة البيانات</a>
+</nav>
+<main><div class="card section"><h1>🗄️ إدارة البيانات</h1>
+<p class="muted">مركز التحكم ببيانات الموقع وتجهيز أدوات الاستيراد والتصدير والنسخ الاحتياطي.</p>
+<div class="grid">
+<div class="box"><h3>📦 بيانات المنتجات</h3><p class="muted">إدارة بيانات المنتجات عند ربط قاعدة البيانات.</p><button onclick="info('products')">فتح</button></div>
+<div class="box"><h3>👥 بيانات العملاء</h3><p class="muted">عرض وتعديل بيانات العملاء لاحقاً.</p><button onclick="info('customers')">فتح</button></div>
+<div class="box"><h3>👨‍💼 بيانات المسوقين</h3><p class="muted">إدارة بيانات المسوقين وحساباتهم.</p><button onclick="info('marketers')">فتح</button></div>
+<div class="box"><h3>🧾 بيانات الطلبات</h3><p class="muted">مراجعة وتنظيم بيانات الطلبات.</p><button onclick="info('orders')">فتح</button></div>
+<div class="box"><h3>📥 استيراد البيانات</h3><p class="muted">واجهة تجهيز للاستيراد الجماعي.</p><button onclick="info('import')">تجهيز</button></div>
+<div class="box"><h3>📤 تصدير البيانات</h3><p class="muted">واجهة تجهيز لتصدير البيانات CSV/Excel.</p><button onclick="info('export')">تجهيز</button></div>
+</div>
+<div id="msg" class="status">الواجهة جاهزة — الربط الفعلي بقاعدة البيانات يأتي لاحقاً ✅</div>
+<div class="note"><b>ملاحظة:</b> هذه المرحلة لا تحذف أو تعدّل بيانات حقيقية، ولا تعتمد على قاعدة البيانات.</div>
+</div></main></div>
+<script>
+function info(type){document.getElementById("msg").textContent="تم اختيار القسم. سيتم تفعيل العملية عند ربط قاعدة البيانات."; }
+</script></body></html>`,"إدارة البيانات");
+}
+
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -1033,6 +1078,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/register") return registerPage();
     if (request.method === "GET" && url.pathname === "/support") return supportPage();
     if (request.method === "GET" && url.pathname === "/payouts") return payoutsPage();
+    if (request.method === "GET" && url.pathname === "/data") return dataManagementPage();
 if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
     if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});
