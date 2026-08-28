@@ -1,10 +1,17 @@
-# Syria Commerce — Phase 14 FIXED
+# Syria Commerce — Phase 15 Consolidated FIXED
 
-Phase 14: Login UI foundation.
+Base: Phase 12 Notifications.
 
-- `/login`
-- Arabic RTL responsive login page
-- Browser-local demo session
-- No database dependency
-- Existing Phase 13 preserved
-- Real authentication/API comes later
+Consolidated additions:
+- Phase 13: `/search`
+- Phase 14: `/login`
+- Phase 15: `/register`
+
+This package includes the Phase 12 base plus all three additions,
+so it can be deployed directly instead of uploading four separate ZIPs.
+
+Pre-deployment checks:
+- Node JavaScript syntax check
+- wrangler.jsonc JSON validation
+- entry point verification
+- route verification
