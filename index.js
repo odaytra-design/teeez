@@ -809,7 +809,51 @@ export default { async fetch(request,env){ const url=new URL(request.url);
  if(request.method==='GET'&&url.pathname==='/notifications') return notificationsPage();
  if(request.method==='GET'&&url.pathname==='/system') return systemPage();
  if(request.method==='GET'&&url.pathname==='/api/health') return json({ok:true,service:'syria-commerce',mode:'admin-complete'});
- if(request.method==='GET'&&url.pathname==='/dashboard') return dashboard(env);
+ 
+function safeAdminPage(title) {
+  const links=[
+    ["/","🏠 الرئيسية"],["/dashboard","👥 المسوقون"],["/products","📦 المنتجات"],
+    ["/orders","🧾 الطلبات"],["/commissions","💰 العمولات"],["/customers","👤 العملاء"],
+    ["/reports","📊 التقارير"],["/settings","⚙️ الإعدادات"],["/permissions","🔐 الصلاحيات"],
+    ["/activity","📝 سجل النشاط"],["/notifications","🔔 الإشعارات"],
+    ["/users","👤 المستخدمون"],["/locations","📍 المحافظات"],
+    ["/payments","💳 الدفع والتوصيل"],["/coupons","🏷️ الكوبونات"],
+    ["/promotions","🎯 العروض"],["/payouts","💸 سحب العمولات"],
+    ["/support","💬 الدعم"],["/data","🗄️ البيانات"],["/monitor","🛡️ المراقبة"]
+  ];
+  const nav=links.map(x=>'<a href="'+x[0]+'">'+x[1]+'</a>').join("");
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} | Syria Commerce</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+.top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+nav{padding:10px;height:max-content}nav a{display:block;padding:11px;border-radius:10px;color:#172033;text-decoration:none}
+nav a:hover{background:#f1f5f9}.section{padding:22px}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
+.muted{color:#667085}.ok{color:#067647;background:#ecfdf3;padding:8px 12px;border-radius:9px;display:inline-block}
+@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+</style></head><body>
+<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">${esc(title)}</div></div></header>
+<div class="layout"><nav>${nav}</nav><main>
+<div class="card section"><span class="badge">Admin</span><h1>${esc(title)}</h1>
+<p class="muted">واجهة الإدارة جاهزة. الربط الفعلي مع قاعدة البيانات سيتم لاحقاً.</p>
+<p class="ok">الصفحة تعمل بشكل مستقل على Cloudflare Workers ✅</p></div>
+</main></div></body></html>`,title);
+}
+
+    if (request.method === "GET" && url.pathname === "/users") return safeAdminPage("المستخدمون");
+    if (request.method === "GET" && url.pathname === "/locations") return safeAdminPage("المحافظات والمناطق");
+    if (request.method === "GET" && url.pathname === "/payments") return safeAdminPage("الدفع والتوصيل");
+    if (request.method === "GET" && url.pathname === "/coupons") return safeAdminPage("الكوبونات والخصومات");
+    if (request.method === "GET" && url.pathname === "/promotions") return safeAdminPage("العروض والبنرات");
+    if (request.method === "GET" && url.pathname === "/payouts") return safeAdminPage("سحب العمولات");
+    if (request.method === "GET" && url.pathname === "/support") return safeAdminPage("دعم العملاء");
+    if (request.method === "GET" && url.pathname === "/data") return safeAdminPage("إدارة البيانات");
+    if (request.method === "GET" && url.pathname === "/monitor") return safeAdminPage("مراقبة النظام");
+if(request.method==='GET'&&url.pathname==='/dashboard') return dashboard(env);
  if(request.method==='GET'&&url.pathname==='/products') return productsPage(env);
  if(request.method==='GET'&&url.pathname==='/orders') return ordersPage(env);
  if(request.method==='GET'&&url.pathname==='/commissions') return commissionsPage(env);
