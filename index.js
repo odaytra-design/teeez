@@ -417,6 +417,110 @@ async function listCustomers(db) {
   return r.results || [];
 }
 
+
+async function reportsPage(env) {
+  const orders = await listOrders(getStore(env));
+  const products = await listProducts(getStore(env));
+
+  const delivered = orders.filter(o => o.status === "delivered");
+  const cancelled = orders.filter(o => o.status === "cancelled");
+  const active = orders.filter(o => !["delivered","cancelled"].includes(o.status));
+
+  const sales = delivered.reduce((a,o)=>a+Number(o.total||0),0);
+  const allSales = orders.reduce((a,o)=>a+Number(o.total||0),0);
+  const dueCommission = delivered.reduce((a,o)=>a+Number(o.commission||0),0);
+
+  const statusNames = {
+    new:"جديد", confirmed:"مؤكد", preparing:"قيد التجهيز",
+    shipped:"تم الشحن", delivered:"تم التسليم", cancelled:"ملغي"
+  };
+  const statusMap = {};
+  for (const o of orders) {
+    const key=o.status||"new";
+    statusMap[key]=(statusMap[key]||0)+1;
+  }
+
+  const productMap = {};
+  for (const o of delivered) {
+    const key=o.product_name||"غير محدد";
+    if(!productMap[key]) productMap[key]={name:key,orders:0,qty:0,sales:0};
+    productMap[key].orders++;
+    productMap[key].qty += Number(o.quantity||0);
+    productMap[key].sales += Number(o.total||0);
+  }
+
+  const marketerMap = {};
+  for (const o of orders) {
+    const key=o.marketer_code||"غير محدد";
+    if(!marketerMap[key]) marketerMap[key]={code:key,orders:0,sales:0};
+    marketerMap[key].orders++;
+    marketerMap[key].sales += Number(o.total||0);
+  }
+
+  const statusRows=Object.entries(statusMap).map(([k,n])=>`
+    <tr><td>${esc(statusNames[k]||k)}</td><td>${n}</td><td>${orders.length ? ((n/orders.length)*100).toFixed(1) : "0.0"}%</td></tr>
+  `).join("");
+
+  const productRows=Object.values(productMap).sort((a,b)=>b.sales-a.sales).map(x=>`
+    <tr><td><strong>${esc(x.name)}</strong></td><td>${x.orders}</td><td>${x.qty}</td><td>${x.sales.toFixed(2)}</td></tr>
+  `).join("");
+
+  const marketerRows=Object.values(marketerMap).sort((a,b)=>b.sales-a.sales).map(x=>`
+    <tr><td><strong>${esc(x.code)}</strong></td><td>${x.orders}</td><td>${x.sales.toFixed(2)}</td></tr>
+  `).join("");
+
+  return htmlResponse(`<!doctype html><html lang="ar" dir="rtl">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>التقارير | Syria Commerce</title>
+  <style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
+  .top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
+  .brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
+  nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
+  nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
+  nav a:hover{background:#f1f5f9}.section,.stat{padding:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+  .num{font-size:28px;font-weight:700;margin-top:8px}.muted{color:#667085}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
+  table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #eee;text-align:right}
+  @media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
+  </style></head><body>
+  <header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">التقارير والإحصائيات</div></div></header>
+  <div class="layout">
+  <nav>
+    <a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a>
+    <a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a>
+    <a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a>
+  </nav>
+  <main>
+    <div class="card section"><span class="badge">Phase 8</span><h1>التقارير</h1>
+      <p class="muted">ملخص المبيعات والطلبات والمنتجات والمسوقين. البيانات حالياً تعمل بدون قاعدة بيانات.</p>
+    </div>
+    <div class="grid">
+      <div class="card stat"><div class="muted">إجمالي الطلبات</div><div class="num">${orders.length}</div></div>
+      <div class="card stat"><div class="muted">تم التسليم</div><div class="num">${delivered.length}</div></div>
+      <div class="card stat"><div class="muted">طلبات قيد المتابعة</div><div class="num">${active.length}</div></div>
+      <div class="card stat"><div class="muted">ملغاة</div><div class="num">${cancelled.length}</div></div>
+      <div class="card stat"><div class="muted">مبيعات المسلّم</div><div class="num">${sales.toFixed(2)}</div></div>
+      <div class="card stat"><div class="muted">عمولات مستحقة</div><div class="num">${dueCommission.toFixed(2)}</div></div>
+    </div>
+
+    <div class="card section"><h2>حالة الطلبات</h2>
+      <div style="overflow:auto"><table><thead><tr><th>الحالة</th><th>العدد</th><th>النسبة</th></tr></thead>
+      <tbody>${statusRows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table></div>
+    </div>
+
+    <div class="card section"><h2>أداء المنتجات</h2>
+      <div style="overflow:auto"><table><thead><tr><th>المنتج</th><th>الطلبات</th><th>الكمية</th><th>المبيعات المسلّمة</th></tr></thead>
+      <tbody>${productRows || '<tr><td colspan="4">لا توجد مبيعات مسلّمة بعد</td></tr>'}</tbody></table></div>
+    </div>
+
+    <div class="card section"><h2>أداء المسوقين</h2>
+      <div style="overflow:auto"><table><thead><tr><th>كود المسوق</th><th>الطلبات</th><th>قيمة الطلبات</th></tr></thead>
+      <tbody>${marketerRows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table></div>
+    </div>
+  </main></div></body></html>`,"التقارير");
+}
+
 async function customersPage(env) {
   const rows=await listCustomers(getStore(env));
   const total=rows.reduce((a,c)=>a+Number(c.total||0),0);
@@ -542,6 +646,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/orders") return ordersPage(env);
     if (request.method === "GET" && url.pathname === "/commissions") return commissionsPage(env);
     if (request.method === "GET" && url.pathname === "/customers") return customersPage(env);
+    if (request.method === "GET" && url.pathname === "/reports") return reportsPage(env);
 
     if (request.method === "GET" && ["/orders","/commissions","/customers","/reports","/settings"].includes(url.pathname)) {
       const names = {"/orders":"الطلبات","/commissions":"العمولات","/customers":"العملاء","/reports":"التقارير","/settings":"الإعدادات"};

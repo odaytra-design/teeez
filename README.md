@@ -1,11 +1,13 @@
-# Syria Commerce — Phase 7 FIXED
-Built directly from confirmed Phase 6 FIXED.
+# Syria Commerce — Phase 8 FIXED
+Built directly from confirmed Phase 7 FIXED.
 
-Customer system:
-- automatic customer list from orders
-- grouping by phone number
-- name, phone, governorate
-- order count
-- total purchases
-- last order
-- no D1 activated yet
+Reports:
+- total orders
+- delivered / active / cancelled
+- delivered sales
+- due commissions
+- order status breakdown
+- product performance
+- marketer performance
+
+No D1 activation yet. Existing Phase 7 customer system is preserved.
