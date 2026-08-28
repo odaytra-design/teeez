@@ -1,6 +1,6 @@
 {
   "name": "syria-commerce",
-  "version": "1.0.0-admin",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "scripts": {

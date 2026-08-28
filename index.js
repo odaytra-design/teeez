@@ -769,62 +769,62 @@ document.querySelector("#f").addEventListener("submit",async e=>{
 </script>`, "لوحة المسوقين");
 }
 
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/") {
-      return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Syria Commerce | الإدارة</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}
-.top{background:#111827;color:white;padding:18px 22px}.wrap{max-width:1100px;margin:auto}
-.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}
-.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}
-nav,.card{background:white;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}
-nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}
-nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-.stat{padding:20px}.num{font-size:30px;font-weight:700;margin-top:8px}.muted{color:#667085}
-.section{padding:20px}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}
-@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}}
-</style></head><body>
-<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">منصة التجارة الإلكترونية — لوحة الإدارة</div></div></header>
-<div class="layout">
-<nav>
-<a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a><a href="/permissions">🔐 الصلاحيات</a><a href="/activity">📝 سجل النشاط</a>
-</nav>
-<main>
-<div class="card hero"><span class="badge">المرحلة 3</span><h1>لوحة الإدارة الرئيسية</h1><p class="muted">الهيكل الأساسي جاهز. سنفعّل كل نظام تدريجياً قبل ربط قاعدة البيانات.</p></div>
-<div class="grid" style="margin-top:14px">
-<div class="card stat"><div class="muted">المسوقون</div><div class="num">—</div></div>
-<div class="card stat"><div class="muted">الطلبات</div><div class="num">—</div></div>
-<div class="card stat"><div class="muted">العمولات</div><div class="num">—</div></div>
-<div class="card stat"><div class="muted">العملاء</div><div class="num">—</div></div>
-</div>
-<div class="card section" style="margin-top:14px"><h2>الأنظمة القادمة</h2><p class="muted">المنتجات • الطلبات • العمولات • العملاء • التقارير • الصلاحيات</p></div>
-</main></div></body></html>`);
-    }
-    
-    if (request.method === "GET" && url.pathname === "/products") return productsPage(env);
-    if (request.method === "GET" && url.pathname === "/orders") return ordersPage(env);
-    if (request.method === "GET" && url.pathname === "/commissions") return commissionsPage(env);
-    if (request.method === "GET" && url.pathname === "/customers") return customersPage(env);
-    if (request.method === "GET" && url.pathname === "/reports") return reportsPage(env);
-    if (request.method === "GET" && url.pathname === "/settings") return settingsPage(env);
-    if (request.method === "GET" && url.pathname === "/permissions") return permissionsPage(env);
-    if (request.method === "GET" && url.pathname === "/activity") return activityPage(env);
+const ADMIN_MODULES = [
+  ["dashboard","📊","الرئيسية","/dashboard"],["marketers","👥","المسوقون","/dashboard"],["products","📦","المنتجات","/products"],
+  ["orders","🧾","الطلبات","/orders"],["customers","👤","العملاء","/customers"],["commissions","💰","العمولات","/commissions"],
+  ["reports","📈","التقارير","/reports"],["withdrawals","💸","سحب العمولات","/withdrawals"],["coupons","🏷️","الكوبونات","/coupons"],
+  ["offers","🎯","العروض والبنرات","/offers"],["delivery","🚚","الدفع والتوصيل","/delivery"],["locations","📍","المحافظات والمناطق","/locations"],
+  ["users","🔐","المستخدمون والصلاحيات","/users"],["support","💬","دعم العملاء","/support"],["activity","📝","سجل النشاط","/activity"],
+  ["notifications","🔔","الإشعارات","/notifications"],["settings","⚙️","الإعدادات","/settings"],["system","🛡️","مراقبة النظام","/system"]
+];
+function navHtml(){return ADMIN_MODULES.map(x=>`<a href="${x[3]}">${x[1]} ${x[2]}</a>`).join("")}
+function adminPage(title,content,script="") { return htmlResponse(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | Syria Commerce</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}.top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1200px;margin:auto}.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}.layout{display:grid;grid-template-columns:230px 1fr;gap:18px;max-width:1200px;margin:22px auto;padding:0 16px}nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}nav{padding:10px;height:max-content}nav a{display:block;padding:11px;border-radius:10px;color:#172033;text-decoration:none;font-size:14px}nav a:hover{background:#f1f5f9}.card{padding:20px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}.num{font-size:28px;font-weight:700;margin-top:7px}.muted{color:#667085}.badge,.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}button{border:0;border-radius:10px;padding:11px 16px;background:#111827;color:#fff;cursor:pointer}.secondary{background:#eef2ff;color:#111827}.danger{background:#b42318}input,select,textarea{width:100%;padding:11px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px}label{display:block;font-weight:600;margin-bottom:6px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}table{width:100%;border-collapse:collapse}th,td{padding:11px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap}.ok{color:#067647;background:#ecfdf3;padding:5px 8px;border-radius:999px}.warn{color:#92400e;background:#fffbeb;padding:5px 8px;border-radius:999px}.empty{text-align:center;padding:28px;color:#667085}@media(max-width:760px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}}
+</style></head><body><header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">لوحة الإدارة الكاملة</div></div></header><div class="layout"><nav>${navHtml()}</nav><main>${content}</main></div><script>${script}</script></body></html>`,title)}
+function localModulePage(title,key,fields,columns){
+ const form=fields.map(f=>`<div><label>${esc(f.label)}</label><input id="f_${f.key}" placeholder="${esc(f.placeholder||'')}" ${f.type==='number'?'type="number"':''}></div>`).join('');
+ const th=columns.map(c=>`<th>${esc(c.label)}</th>`).join('');
+ const js=`const K='sc_${key}';function get(){try{return JSON.parse(localStorage.getItem(K)||'[]')}catch{return[]}}function save(a){localStorage.setItem(K,JSON.stringify(a));render()}function esc2(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}function render(){const a=get(),b=document.getElementById('rows');b.innerHTML=a.map((x,i)=>'<tr>${columns.map(c=>'<td>'+esc2(x['${c.key}'])+'</td>').join('')}<td><button class="danger" onclick="del('+i+')">حذف</button></td></tr>').join('');document.getElementById('empty').style.display=a.length?'none':'block'}function del(i){const a=get();a.splice(i,1);save(a)}document.getElementById('form').onsubmit=e=>{e.preventDefault();const x={};${fields.map(f=>`x['${f.key}']=document.getElementById('f_${f.key}').value`).join('')}x.created_at=new Date().toISOString();save([x,...get()]);e.target.reset()};render();`;
+ return adminPage(title,`<div class="card"><span class="badge">لوحة الإدارة</span><h1>${esc(title)}</h1><p class="muted">إدارة كاملة للبيانات من الواجهة. سيتم تحويل التخزين إلى قاعدة البيانات عند مرحلة الربط.</p></div><div class="card"><h2>إضافة</h2><form id="form"><div class="row">${form}</div><button>حفظ</button></form></div><div class="card"><h2>القائمة</h2><div style="overflow:auto"><table><thead><tr>${th}<th>إجراء</th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty">لا توجد بيانات.</div></div>`,js)
+}
+async function withdrawalsPage(){return localModulePage('سحب العمولات','withdrawals',[{key:'marketer',label:'كود المسوق'},{key:'amount',label:'المبلغ',type:'number'},{key:'method',label:'طريقة السحب'}],[{key:'marketer',label:'المسوق'},{key:'amount',label:'المبلغ'},{key:'method',label:'الطريقة'}])}
+async function couponsPage(){return localModulePage('الكوبونات والخصومات','coupons',[{key:'code',label:'الكود'},{key:'discount',label:'الخصم',type:'number'},{key:'status',label:'الحالة',placeholder:'فعال / متوقف'}],[{key:'code',label:'الكود'},{key:'discount',label:'الخصم'},{key:'status',label:'الحالة'}])}
+async function offersPage(){return localModulePage('العروض والبنرات','offers',[{key:'title',label:'العنوان'},{key:'image',label:'رابط الصورة'},{key:'status',label:'الحالة'}],[{key:'title',label:'العنوان'},{key:'image',label:'الصورة'},{key:'status',label:'الحالة'}])}
+async function deliveryPage(){return localModulePage('الدفع والتوصيل','delivery',[{key:'name',label:'الاسم'},{key:'fee',label:'الرسوم',type:'number'},{key:'status',label:'الحالة'}],[{key:'name',label:'الاسم'},{key:'fee',label:'الرسوم'},{key:'status',label:'الحالة'}])}
+async function locationsPage(){return localModulePage('المحافظات والمناطق','locations',[{key:'governorate',label:'المحافظة'},{key:'area',label:'المنطقة'}],[{key:'governorate',label:'المحافظة'},{key:'area',label:'المنطقة'}])}
+async function usersPage(){return localModulePage('المستخدمون والصلاحيات','users',[{key:'name',label:'الاسم'},{key:'email',label:'البريد'},{key:'role',label:'الدور'}],[{key:'name',label:'الاسم'},{key:'email',label:'البريد'},{key:'role',label:'الدور'}])}
+async function supportPage(){return localModulePage('دعم العملاء','support',[{key:'customer',label:'العميل'},{key:'subject',label:'الموضوع'},{key:'status',label:'الحالة'}],[{key:'customer',label:'العميل'},{key:'subject',label:'الموضوع'},{key:'status',label:'الحالة'}])}
+async function notificationsPage(){return localModulePage('الإشعارات','notifications',[{key:'title',label:'العنوان'},{key:'message',label:'الرسالة'},{key:'type',label:'النوع'}],[{key:'title',label:'العنوان'},{key:'message',label:'الرسالة'},{key:'type',label:'النوع'}])}
+async function systemPage(){return adminPage('مراقبة النظام',`<div class="card"><span class="badge">System</span><h1>مراقبة النظام</h1><div class="grid"><div class="card"><div class="muted">Worker</div><div class="num" id="worker">...</div></div><div class="card"><div class="muted">API</div><div class="num" id="api">...</div></div><div class="card"><div class="muted">قاعدة البيانات</div><div class="num">غير مربوطة</div></div></div><button onclick="check()">فحص الآن</button><p id="msg" class="muted"></p></div>`,`async function check(){document.getElementById('worker').textContent='✓ يعمل';try{const r=await fetch('/api/health');const d=await r.json();document.getElementById('api').textContent=d.ok?'✓ OK':'✕';document.getElementById('msg').textContent='تم فحص API بنجاح'}catch(e){document.getElementById('api').textContent='✕'}}check();`)}
 
-
-    if (request.method === "GET" && url.pathname === "/dashboard") return dashboard(env);
-    if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
-    if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});
-    if (request.method === "GET" && url.pathname === "/api/products") return json({ok:true,products:await listProducts(getStore(env))});
-    if (request.method === "GET" && url.pathname === "/api/orders") return json({ok:true,orders:await listOrders(getStore(env))});
-    if (request.method === "POST" && url.pathname === "/api/orders") return createOrder(request,env);
-    if (request.method === "PATCH" && url.pathname === "/api/orders") return updateOrder(request,env);
-    if (request.method === "POST" && url.pathname === "/api/products") return createProduct(request,env);
-    if (request.method === "DELETE" && url.pathname === "/api/products") return deleteProduct(request,env);
-    if (request.method === "POST" && url.pathname === "/api/marketers") return register(request,env);
-    return json({ok:false,error:"Not Found"},404);
-  }
-};
+export default { async fetch(request,env){ const url=new URL(request.url);
+ if(request.method==='GET'&&url.pathname==='/') return adminPage('الرئيسية',`<div class="card"><span class="badge">Admin Complete</span><h1>لوحة الإدارة</h1><p class="muted">جميع أقسام الإدارة في مكان واحد. الموقع العام وقاعدة البيانات سيتم ربطهما لاحقاً.</p></div><div class="grid">${ADMIN_MODULES.map(x=>`<a class="card" href="${x[3]}" style="color:#172033;text-decoration:none"><div style="font-size:25px">${x[1]}</div><h3>${x[2]}</h3><div class="muted">فتح القسم</div></a>`).join('')}</div>`);
+ if(request.method==='GET'&&url.pathname==='/withdrawals') return withdrawalsPage();
+ if(request.method==='GET'&&url.pathname==='/coupons') return couponsPage();
+ if(request.method==='GET'&&url.pathname==='/offers') return offersPage();
+ if(request.method==='GET'&&url.pathname==='/delivery') return deliveryPage();
+ if(request.method==='GET'&&url.pathname==='/locations') return locationsPage();
+ if(request.method==='GET'&&url.pathname==='/users') return usersPage();
+ if(request.method==='GET'&&url.pathname==='/support') return supportPage();
+ if(request.method==='GET'&&url.pathname==='/notifications') return notificationsPage();
+ if(request.method==='GET'&&url.pathname==='/system') return systemPage();
+ if(request.method==='GET'&&url.pathname==='/api/health') return json({ok:true,service:'syria-commerce',mode:'admin-complete'});
+ if(request.method==='GET'&&url.pathname==='/dashboard') return dashboard(env);
+ if(request.method==='GET'&&url.pathname==='/products') return productsPage(env);
+ if(request.method==='GET'&&url.pathname==='/orders') return ordersPage(env);
+ if(request.method==='GET'&&url.pathname==='/commissions') return commissionsPage(env);
+ if(request.method==='GET'&&url.pathname==='/customers') return customersPage(env);
+ if(request.method==='GET'&&url.pathname==='/reports') return reportsPage(env);
+ if(request.method==='GET'&&url.pathname==='/settings') return settingsPage(env);
+ if(request.method==='GET'&&url.pathname==='/permissions') return permissionsPage(env);
+ if(request.method==='GET'&&url.pathname==='/activity') return activityPage(env);
+ if(request.method==='GET'&&url.pathname==='/api/marketers') return json({ok:true,marketers:await listMarketers(getStore(env))});
+ if(request.method==='GET'&&url.pathname==='/api/products') return json({ok:true,products:await listProducts(getStore(env))});
+ if(request.method==='GET'&&url.pathname==='/api/orders') return json({ok:true,orders:await listOrders(getStore(env))});
+ if(request.method==='POST'&&url.pathname==='/api/orders') return createOrder(request,env);
+ if(request.method==='PATCH'&&url.pathname==='/api/orders') return updateOrder(request,env);
+ if(request.method==='POST'&&url.pathname==='/api/products') return createProduct(request,env);
+ if(request.method==='DELETE'&&url.pathname==='/api/products') return deleteProduct(request,env);
+ if(request.method==='POST'&&url.pathname==='/api/marketers') return register(request,env);
+ return json({ok:false,error:'Not Found'},404);
+ }};

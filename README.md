@@ -1,32 +1,7 @@
-# Syria Commerce — ADMIN COMPLETE UI
-Built from the uploaded Phase 11 FIXED v2 baseline.
+# Syria Commerce — ADMIN COMPLETE
 
-This package completes the Admin Dashboard UI in one deployable bundle:
-- Dashboard
-- Marketers
-- Products
-- Orders
-- Commissions
-- Customers
-- Reports
-- Users
-- Regions / governorates
-- Payment & delivery methods
-- Coupons / discounts
-- Campaigns / banners
-- Commission payout requests
-- Customer support
-- Settings
-- Permissions
-- Activity log
-- Notifications
-- Local data export/clear
-- System/API health monitor
+واجهة لوحة الإدارة كاملة كمرحلة واجهات قبل قاعدة البيانات.
 
-Important:
-- This is the complete ADMIN INTERFACE layer.
-- It intentionally does NOT activate D1/database yet.
-- New admin modules use browser-local storage until the backend/database phase.
-- Existing working modules are preserved from the uploaded baseline.
+تشمل: dashboard, marketers, products, orders, customers, commissions, reports, withdrawals, coupons, offers/banners, delivery/payment, locations, users/permissions, support, activity, notifications, settings, system monitoring.
 
-Before deployment, JavaScript syntax and wrangler config are validated.
+التخزين الجديد لبعض الأقسام محلي في المتصفح حتى مرحلة ربط D1/API.
