@@ -242,6 +242,82 @@ async function delProduct(id){
 </script>`, "المنتجات");
 }
 
+
+const DEMO_ORDERS = [
+  {id:1, order_no:"ORD-0001", product_id:1, product_name:"منتج تجريبي", marketer_code:"SYR-0001", customer_name:"عميل تجريبي", customer_phone:"0790000001", governorate:"عمّان", quantity:1, total:100, commission:10, status:"new", created_at:new Date().toISOString()}
+];
+
+async function listOrders(db) {
+  if (!db) return DEMO_ORDERS;
+  const r = await db.prepare("SELECT * FROM orders ORDER BY id DESC").all();
+  return r.results || [];
+}
+
+async function createOrder(request, env) {
+  const d=await request.json().catch(()=>({}));
+  const product_id=Number(d.product_id), quantity=Number(d.quantity||1);
+  const product=(await listProducts(getStore(env))).find(x=>x.id===product_id);
+  if(!product) return json({ok:false,error:"المنتج غير موجود"},404);
+  if(!Number.isInteger(quantity)||quantity<1) return json({ok:false,error:"الكمية غير صحيحة"},400);
+  if(Number(product.stock)<quantity) return json({ok:false,error:"الكمية المطلوبة غير متوفرة"},400);
+
+  const customer_name=String(d.customer_name||"").trim();
+  const customer_phone=String(d.customer_phone||"").trim();
+  const governorate=String(d.governorate||"").trim();
+  const marketer_code=String(d.marketer_code||"").trim();
+  if(!customer_name||!customer_phone||!governorate||!marketer_code)
+    return json({ok:false,error:"بيانات العميل وكود المسوق مطلوبة"},400);
+
+  const total=Number(product.price)*quantity;
+  const commission=Number(product.commission)*quantity;
+  const order_no="ORD-"+String(Date.now()).slice(-8);
+  const created_at=new Date().toISOString();
+  const row={order_no,product_id,product_name:product.name,marketer_code,customer_name,customer_phone,governorate,quantity,total,commission,status:"new",created_at};
+
+  const db=getStore(env);
+  if(db){
+    await db.prepare(`INSERT INTO orders
+      (order_no,product_id,product_name,marketer_code,customer_name,customer_phone,governorate,quantity,total,commission,status,created_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).bind(order_no,product_id,product.name,marketer_code,customer_name,customer_phone,governorate,quantity,total,commission,"new",created_at).run();
+  } else {
+    DEMO_ORDERS.unshift({id:Math.max(0,...DEMO_ORDERS.map(x=>x.id))+1,...row});
+  }
+  return json({ok:true,order:row});
+}
+
+async function updateOrder(request,env){
+  const d=await request.json().catch(()=>({}));
+  const id=Number(d.id), status=String(d.status||"");
+  const allowed=["new","confirmed","preparing","shipped","delivered","cancelled"];
+  if(!Number.isInteger(id)||!allowed.includes(status)) return json({ok:false,error:"بيانات غير صالحة"},400);
+  const db=getStore(env);
+  if(db) await db.prepare("UPDATE orders SET status=? WHERE id=?").bind(status,id).run();
+  else { const o=DEMO_ORDERS.find(x=>x.id===id); if(o)o.status=status; }
+  return json({ok:true});
+}
+
+async function ordersPage(env){
+ const rows=await listOrders(getStore(env));
+ const labels={new:"جديد",confirmed:"مؤكد",preparing:"قيد التجهيز",shipped:"تم الشحن",delivered:"تم التسليم",cancelled:"ملغي"};
+ const tr=rows.map(o=>`<tr><td>${esc(o.order_no)}</td><td>${esc(o.product_name)}</td><td>${esc(o.customer_name)}<div class="muted">${esc(o.customer_phone)}</div></td><td>${esc(o.marketer_code)}</td><td>${o.quantity}</td><td>${Number(o.total).toFixed(2)}</td><td>${Number(o.commission).toFixed(2)}</td><td><select onchange="setStatus(${o.id},this.value)">${Object.entries(labels).map(([k,v])=>`<option value="${k}" ${o.status===k?"selected":""}>${v}</option>`).join("")}</select></td></tr>`).join("");
+ const products=await listProducts(getStore(env));
+ const opts=products.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.price}</option>`).join("");
+ return htmlResponse(`<header class="top"><div class="wrap"><div class="brand">Syria Commerce</div><div class="sub">إدارة الطلبات</div></div></header>
+ <div class="layout"><nav><a href="/">🏠 الرئيسية</a><a href="/dashboard">👥 المسوقون</a><a href="/products">📦 المنتجات</a><a href="/orders">🧾 الطلبات</a><a href="/commissions">💰 العمولات</a><a href="/customers">👤 العملاء</a><a href="/reports">📊 التقارير</a><a href="/settings">⚙️ الإعدادات</a></nav>
+ <main><div class="card section"><span class="badge">المرحلة 5</span><h1>نظام الطلبات</h1><p class="muted">تسجيل الطلب، ربطه بالمنتج والمسوق، ومتابعة حالته حتى التسليم.</p></div>
+ <div class="card section"><h2>تسجيل طلب</h2><form id="orderForm"><div class="row"><div><label>المنتج</label><select name="product_id" required>${opts}</select></div><div><label>الكمية</label><input name="quantity" type="number" min="1" value="1" required></div></div>
+ <div class="row"><div><label>اسم العميل</label><input name="customer_name" required></div><div><label>هاتف العميل</label><input name="customer_phone" required></div></div>
+ <div class="row"><div><label>المحافظة</label><input name="governorate" required></div><div><label>كود المسوق</label><input name="marketer_code" placeholder="SYR-0001" required></div></div>
+ <button class="btn" style="margin-top:14px">تسجيل الطلب</button> <span id="msg" class="muted"></span></form></div>
+ <div class="card section"><h2>الطلبات (${rows.length})</h2><div style="overflow:auto"><table><thead><tr><th>رقم الطلب</th><th>المنتج</th><th>العميل</th><th>المسوق</th><th>الكمية</th><th>الإجمالي</th><th>العمولة</th><th>الحالة</th></tr></thead><tbody>${tr||"<tr><td colspan=8>لا توجد طلبات</td></tr>"}</tbody></table></div></div>
+ </main></div><style>
+ *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,sans-serif}.top{background:#111827;color:#fff;padding:18px 22px}.wrap{max-width:1100px;margin:auto}.brand{font-size:24px;font-weight:700}.sub{opacity:.75;margin-top:5px}.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;max-width:1100px;margin:22px auto;padding:0 16px}nav,.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 4px 18px #00000008}nav{padding:10px;height:max-content}nav a{display:block;padding:13px;border-radius:10px;color:#172033;text-decoration:none}nav a:hover{background:#f1f5f9}.section{padding:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}label{display:block;margin-bottom:6px;font-weight:600}input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px}.btn{border:0;border-radius:10px;padding:11px 16px;background:#111827;color:#fff;cursor:pointer}.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff}.muted{color:#667085}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap}@media(max-width:700px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}}
+ </style><script>
+ document.querySelector("#orderForm").addEventListener("submit",async e=>{e.preventDefault();let m=document.querySelector("#msg");m.textContent="جاري الحفظ...";let r=await fetch("/api/orders",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});let d=await r.json();m.textContent=d.ok?"تم تسجيل الطلب: "+d.order.order_no:(d.error||"حدث خطأ");if(d.ok)setTimeout(()=>location.reload(),600)});
+ async function setStatus(id,status){let r=await fetch("/api/orders",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status})});let d=await r.json();if(!d.ok)alert(d.error||"حدث خطأ");}
+ </script>`,"الطلبات");
+}
+
 async function dashboard(env) {
   const rows = await listMarketers(getStore(env));
   const dbState = getStore(env) ? "متصل" : "وضع تجريبي — قاعدة البيانات لم تُربط بعد";
@@ -310,6 +386,7 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     }
     
     if (request.method === "GET" && url.pathname === "/products") return productsPage(env);
+    if (request.method === "GET" && url.pathname === "/orders") return ordersPage(env);
 
     if (request.method === "GET" && ["/orders","/commissions","/customers","/reports","/settings"].includes(url.pathname)) {
       const names = {"/orders":"الطلبات","/commissions":"العمولات","/customers":"العملاء","/reports":"التقارير","/settings":"الإعدادات"};
@@ -320,6 +397,9 @@ nav a:hover{background:#f1f5f9}.hero{padding:24px}.grid{display:grid;grid-templa
     if (request.method === "GET" && url.pathname === "/api/health") return json({ok:true,phase:"2",service:"syria-commerce"});
     if (request.method === "GET" && url.pathname === "/api/marketers") return json({ok:true,marketers:await listMarketers(getStore(env))});
     if (request.method === "GET" && url.pathname === "/api/products") return json({ok:true,products:await listProducts(getStore(env))});
+    if (request.method === "GET" && url.pathname === "/api/orders") return json({ok:true,orders:await listOrders(getStore(env))});
+    if (request.method === "POST" && url.pathname === "/api/orders") return createOrder(request,env);
+    if (request.method === "PATCH" && url.pathname === "/api/orders") return updateOrder(request,env);
     if (request.method === "POST" && url.pathname === "/api/products") return createProduct(request,env);
     if (request.method === "DELETE" && url.pathname === "/api/products") return deleteProduct(request,env);
     if (request.method === "POST" && url.pathname === "/api/marketers") return register(request,env);
